@@ -58,7 +58,7 @@ export const logColored = (() => {
         (first: unknown, ...args: unknown[]): void
       } = getLogFunction(color)
       for (const method in LOG_FUNCTIONS) {
-        // @ts-expect-error TODO fix this
+        // @ts-ignore
         resultFunc[method as keyof typeof LOG_FUNCTIONS] = getLogFunction(
           color,
           LOG_FUNCTIONS[method as keyof typeof LOG_FUNCTIONS]
