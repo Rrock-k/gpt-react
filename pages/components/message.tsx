@@ -4,10 +4,7 @@ import { vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import { ChatCompletionResponseMessage } from 'openai'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
-import { detectLanguage } from '@/config/detectLanguage'
-import { logColored } from '@/dev/logColored'
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light-async'
-// import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/light-async'
 
 const CODE_BLOCK_REGEX = /```[\s\S]*?```/g
 
@@ -40,9 +37,6 @@ export const Message = ({
     )
   })
 
-  logColored('parts', parts)
-  logColored('contentParts', contentParts)
-
   return (
     <Box
       sx={(theme) => ({
@@ -70,8 +64,6 @@ const CodeBlock = ({ code }: { code: string }) => {
   const withoutQuotes = code.slice(3, -3).trim()
   const [language, ...rest] = withoutQuotes.split('\n')
   const cleanedCode = rest.join('\n')
-
-  logColored({ language, cleanedCode })
 
   //
   return (
