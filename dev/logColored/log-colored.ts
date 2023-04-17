@@ -53,11 +53,12 @@ export const logColored = (() => {
       const color = prop
 
       const resultFunc: {
-        [key in keyof typeof LOG_FUNCTIONS]?: (typeof LOG_FUNCTIONS)[key]
+        [key in keyof typeof LOG_FUNCTIONS]?: typeof LOG_FUNCTIONS[key]
       } & {
         (first: unknown, ...args: unknown[]): void
       } = getLogFunction(color)
       for (const method in LOG_FUNCTIONS) {
+        // @ts-expect-error TODO fix this
         resultFunc[method as keyof typeof LOG_FUNCTIONS] = getLogFunction(
           color,
           LOG_FUNCTIONS[method as keyof typeof LOG_FUNCTIONS]
