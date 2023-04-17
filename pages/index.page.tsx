@@ -15,6 +15,7 @@ import {
 import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
+import { Message } from './components/message'
 
 const wrapInMessage = (
   content: string,
@@ -111,21 +112,5 @@ export default function Home() {
         </Container>
       </main>
     </>
-  )
-}
-
-const Message = ({ message }: { message: ChatCompletionResponseMessage }) => {
-  return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor:
-          message.role === 'user' ? theme.colors.gray5 : theme.colors.blue[1],
-        padding: '.7rem',
-        border: `1px solid ${theme.colors.gray25[0]}`,
-        borderRadius: theme.radius.md,
-      })}
-    >
-      <Text size="sm">{message.content}</Text>
-    </Box>
   )
 }
