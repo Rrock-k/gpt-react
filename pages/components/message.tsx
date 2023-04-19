@@ -4,15 +4,21 @@ import { vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import { ChatCompletionResponseMessage } from 'openai'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
+import DefaultSyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/default-highlight'
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/light-async'
+import { WrappedMessage } from '@/types'
 
 const CODE_BLOCK_REGEX = /```[\s\S]*?```/g
 
 export const Message = ({
-  message,
+  wrappedMessage,
 }: {
-  message: ChatCompletionResponseMessage
+  wrappedMessage: WrappedMessage
 }) => {
+  const { hidden, message } = wrappedMessage
+
+  if (hidden) return null
+
   const parts = message.content.split(CODE_BLOCK_REGEX)
   const contentParts = message.content.match(CODE_BLOCK_REGEX) || []
 
@@ -63,12 +69,17 @@ const CodeBlock = ({ code }: { code: string }) => {
 
   const withoutQuotes = code.slice(3, -3).trim()
   const [language, ...rest] = withoutQuotes.split('\n')
-  const cleanedCode = rest.join('\n')
 
+  const isSupported =
+    DefaultSyntaxHighlighter.supportedLanguages.includes(language)
+
+  const cleanedCode = (isSupported ? rest : [language, ...rest]).join('\n')
+
+  const label = isSupported ? language : null
   //
   return (
     <Stack spacing={'0px'} my="1rem">
-      {language ? (
+      {label ? (
         <Text
           size="xs"
           color="gray"
@@ -86,25 +97,16 @@ const CodeBlock = ({ code }: { code: string }) => {
       <SyntaxHighlighter
         language={language}
         style={vs2015}
+        showLineNumbers={true}
         customStyle={{
           borderBottomLeftRadius: BORDER_RADIUS,
           borderBottomRightRadius: BORDER_RADIUS,
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
+          borderTopLeftRadius: label ? 0 : BORDER_RADIUS,
+          borderTopRightRadius: label ? 0 : BORDER_RADIUS,
         }}
       >
         {cleanedCode.replace(`${language}\n` ?? '', '')}
       </SyntaxHighlighter>
     </Stack>
   )
-}
-
-const HighlightedParts = ({
-  parts,
-  contentParts,
-}: {
-  parts: string[]
-  contentParts: RegExpMatchArray | []
-}) => {
-  return <></>
 }

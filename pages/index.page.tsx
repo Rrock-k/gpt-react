@@ -1,34 +1,28 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useForm } from '@mantine/form'
-import {
-  Anchor,
-  Box,
-  Button,
-  Container,
-  Flex,
-  Stack,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core'
+import { Box, Button, Container, Stack, Text, Textarea } from '@mantine/core'
 import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
 import { Message } from './components/message'
+import { codeSnippetsFormattingInstructionMessage } from '@/instructions/instructions'
+import { WrappedMessage } from '@/types'
 
-const wrapInMessage = (
-  content: string,
-  role: ChatCompletionResponseMessage['role'] = 'user'
+const wrapInWrappedMessage = (
+  message: ChatCompletionResponseMessage,
+  hidden = false
 ) => ({
-  content,
-  role,
+  message: message,
+  hidden,
 })
 
 export default function Home() {
   const { mutateAsync: sendMessages } = useOpenAiQuery()
 
-  const [messages, setMessages] = useState<ChatCompletionResponseMessage[]>([])
+  const [wrappedMessages, setWrappedMessages] = useState<WrappedMessage[]>([
+    codeSnippetsFormattingInstructionMessage,
+  ])
 
   const form = useForm({
     initialValues: {
@@ -38,16 +32,22 @@ export default function Home() {
   })
 
   const handleButtonClick = async () => {
-    const message = wrapInMessage(form.values.prompt)
+    const wrappedMessage = wrapInWrappedMessage({
+      content: form.values.prompt,
+      role: 'user',
+    })
     form.setFieldValue('prompt', '')
 
-    messages.push(message)
-    const newMessages = await sendMessages(messages)
-    setMessages(newMessages)
+    wrappedMessages.push(wrappedMessage)
+    const responseMessage = await sendMessages(wrappedMessages)
+    const newMessage = responseMessage.at(-1)
+    setWrappedMessages((old) =>
+      newMessage != null ? [...old, wrapInWrappedMessage(newMessage)] : old
+    )
   }
 
   const handleClear = () => {
-    setMessages([])
+    setWrappedMessages([])
   }
 
   const mantineButtonRef = useRef<HTMLButtonElement>(null)
@@ -71,9 +71,14 @@ export default function Home() {
           <Box component="form" onSubmit={form.onSubmit(handleButtonClick)}>
             <Stack>
               <Stack spacing={4}>
-                {messages.map((message, index) => {
-                  return <Message message={message} key={index} />
-                })}
+                {wrappedMessages
+                  .map((wrappedMessage, index) => {
+                    if (wrappedMessage.hidden) return null
+                    return (
+                      <Message wrappedMessage={wrappedMessage} key={index} />
+                    )
+                  })
+                  .filter(Boolean)}
               </Stack>
 
               <Textarea
