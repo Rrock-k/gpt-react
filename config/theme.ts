@@ -10,16 +10,13 @@ import {
 export const customColors = {
   // as in Figma
   // https://www.figma.com/file/k61yZ0UVAlmOlvtTRJWFCh/Marketplace?node-id=470%3A11377&t=S3aqhDYsBpC3jlk8-4
-  primary: '#C91D84',
-  success: '#25C984',
+  primary: '#00a67d',
+  success: '#00a67d',
   error: '#E03F34',
-  //
-  pink: '#C91D84',
-  pink5: '#FBEDF6',
-  pink25: '#F6E9F2',
   //
   gray5: '#F6F7F9',
   gray10: '#EAEDF0',
+  gray20: '#d9d9d9',
   gray25: '#C6CAD2',
   gray50: '#737A87',
   gray80: '#3B3E45',
@@ -30,6 +27,9 @@ export const customColors = {
   //
   yellow5: '#FFF8E6',
   yellow50: '#C28C04',
+  //
+  lightOrange: '#F9DBBD',
+  naplesYellow: '#FFE66D',
 }
 
 // format colors for mantine theme

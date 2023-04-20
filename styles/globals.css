@@ -35,8 +35,7 @@ body {
 }
 
 a {
-  color: rgb(15, 102, 209) !important;
-  text-decoration: underline !important;
+  text-decoration: none;
 }
 
 p {

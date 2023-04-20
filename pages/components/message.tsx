@@ -47,9 +47,10 @@ export const Message = ({
     <Box
       sx={(theme) => ({
         backgroundColor:
-          message.role === 'user' ? theme.colors.gray5 : theme.colors.blue[0],
+          message.role === 'user' ? theme.colors.gray[7] : theme.colors.gray[9],
+        color: theme.colors.gray20,
         padding: '1.2rem',
-        border: `1px solid ${theme.colors.gray25[0]}`,
+        border: `1px solid ${theme.black}`,
         borderRadius: theme.radius.md,
       })}
     >
@@ -82,7 +83,7 @@ const CodeBlock = ({ code }: { code: string }) => {
       {label ? (
         <Text
           size="xs"
-          color="gray"
+          color="gray25"
           bg="dark"
           p="3px"
           px="xs"
@@ -105,7 +106,7 @@ const CodeBlock = ({ code }: { code: string }) => {
           borderTopRightRadius: label ? 0 : BORDER_RADIUS,
         }}
       >
-        {cleanedCode.replace(`${language}\n` ?? '', '')}
+        {cleanedCode}
       </SyntaxHighlighter>
     </Stack>
   )

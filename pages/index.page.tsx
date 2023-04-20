@@ -2,12 +2,17 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useForm } from '@mantine/form'
 import { Box, Button, Container, Stack, Text, Textarea } from '@mantine/core'
-import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
+import {
+  useOpenAiQuery,
+  useOpenAiQueryDirect,
+  useOpenAiQueryStream,
+} from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
 import { Message } from './components/message'
 import { codeSnippetsFormattingInstructionMessage } from '@/instructions/instructions'
 import { WrappedMessage } from '@/types'
+import { logColored } from '@/dev/logColored'
 
 const wrapInWrappedMessage = (
   message: ChatCompletionResponseMessage,
@@ -26,12 +31,13 @@ export default function Home() {
 
   const form = useForm({
     initialValues: {
-      prompt:
-        'Hey there, this is just a test prompt. But anyways nice chatting with you.',
+      prompt: '',
     },
   })
 
   const handleButtonClick = async () => {
+    if (form.values.prompt.trim().length === 0) return
+
     const wrappedMessage = wrapInWrappedMessage({
       content: form.values.prompt,
       role: 'user',
@@ -67,7 +73,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Container fluid sx={{ width: '100%' }}>
+        <Container sx={{ width: '100%' }} size="md">
           <Box component="form" onSubmit={form.onSubmit(handleButtonClick)}>
             <Stack>
               <Stack spacing={4}>
@@ -84,8 +90,13 @@ export default function Home() {
               <Textarea
                 //
                 label="Prompt"
+                styles={{
+                  input: {
+                    fontSize: '.9rem',
+                  },
+                }}
                 {...form.getInputProps('prompt')}
-                placeholder="This is a test prompt"
+                placeholder="Send a message..."
                 onKeyDown={handleKeyPress}
               />
 
@@ -93,12 +104,14 @@ export default function Home() {
                 //
                 ref={mantineButtonRef}
                 type="submit"
+                color="success"
               >
                 Submit
               </Button>
 
               <Text
                 onClick={handleClear}
+                c="gray20"
                 component="a"
                 align="center"
                 size="sm"
