@@ -10,7 +10,10 @@ export default async function handler(
   try {
     const messages = req.body
 
-    logColored('process.env.OPENAI_API_KEY', process.env.OPENAI_API_KEY)
+    logColored(
+      'process.env.NEXT_PUBLIC_OPENAI_API_KEY',
+      process.env.NEXT_PUBLIC_OPENAI_API_KEY
+    )
     logColored('messages', messages)
 
     const result = await askGpt(messages)
