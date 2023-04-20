@@ -9,10 +9,7 @@ import { Message } from './components/message'
 import { codeSnippetsFormattingInstructionMessage } from '@/instructions/instructions'
 import { WrappedMessage } from '@/types'
 
-const wrapInWrappedMessage = (
-  message: ChatCompletionResponseMessage,
-  hidden = false
-) => ({
+const wrapInWrappedMessage = (message: ChatCompletionResponseMessage, hidden = false) => ({
   message: message,
   hidden,
 })
@@ -20,9 +17,7 @@ const wrapInWrappedMessage = (
 export default function Home() {
   const { mutateAsync: sendMessages } = useOpenAiQuery()
 
-  const [wrappedMessages, setWrappedMessages] = useState<WrappedMessage[]>([
-    codeSnippetsFormattingInstructionMessage,
-  ])
+  const [wrappedMessages, setWrappedMessages] = useState<WrappedMessage[]>([codeSnippetsFormattingInstructionMessage])
 
   const form = useForm({
     initialValues: {
@@ -42,9 +37,7 @@ export default function Home() {
     wrappedMessages.push(wrappedMessage)
     const responseMessages = await sendMessages(wrappedMessages)
     const newMessage = responseMessages[responseMessages.length - 1]
-    setWrappedMessages((old) =>
-      newMessage != null ? [...old, wrapInWrappedMessage(newMessage)] : old
-    )
+    setWrappedMessages((old) => (newMessage != null ? [...old, wrapInWrappedMessage(newMessage)] : old))
   }
 
   const handleClear = () => {
@@ -55,6 +48,7 @@ export default function Home() {
 
   const handleKeyPress: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
       mantineButtonRef.current?.click()
     }
   }
@@ -63,10 +57,7 @@ export default function Home() {
     <>
       <Head>
         <title>goodbadgood.dev</title>
-        <meta
-          name="description"
-          content="Kirill Zhaborovskii's personal page"
-        />
+        <meta name="description" content="Kirill Zhaborovskii's personal page" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -78,9 +69,7 @@ export default function Home() {
                 {wrappedMessages
                   .map((wrappedMessage, index) => {
                     if (wrappedMessage.hidden) return null
-                    return (
-                      <Message wrappedMessage={wrappedMessage} key={index} />
-                    )
+                    return <Message wrappedMessage={wrappedMessage} key={index} />
                   })
                   .filter(Boolean)}
               </Stack>
