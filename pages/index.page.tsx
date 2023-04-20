@@ -2,17 +2,12 @@ import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useForm } from '@mantine/form'
 import { Box, Button, Container, Stack, Text, Textarea } from '@mantine/core'
-import {
-  useOpenAiQuery,
-  useOpenAiQueryDirect,
-  useOpenAiQueryStream,
-} from '@/react-query/useOpenAiQuery'
+import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
 import { Message } from './components/message'
 import { codeSnippetsFormattingInstructionMessage } from '@/instructions/instructions'
 import { WrappedMessage } from '@/types'
-import { logColored } from '@/dev/logColored'
 
 const wrapInWrappedMessage = (
   message: ChatCompletionResponseMessage,
