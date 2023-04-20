@@ -40,8 +40,8 @@ export default function Home() {
     form.setFieldValue('prompt', '')
 
     wrappedMessages.push(wrappedMessage)
-    const responseMessage = await sendMessages(wrappedMessages)
-    const newMessage = responseMessage.at(-1)
+    const responseMessages = await sendMessages(wrappedMessages)
+    const newMessage = responseMessages[responseMessages.length - 1]
     setWrappedMessages((old) =>
       newMessage != null ? [...old, wrapInWrappedMessage(newMessage)] : old
     )
