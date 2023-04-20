@@ -10,11 +10,7 @@ import { WrappedMessage } from '@/types'
 
 const CODE_BLOCK_REGEX = /```[\s\S]*?```/g
 
-export const Message = ({
-  wrappedMessage,
-}: {
-  wrappedMessage: WrappedMessage
-}) => {
+export const Message = ({ wrappedMessage }: { wrappedMessage: WrappedMessage }) => {
   const { hidden, message } = wrappedMessage
 
   if (hidden) return null
@@ -38,16 +34,13 @@ export const Message = ({
       ])
       .filter(Boolean)
 
-    return [result, <CodeBlock code={codeBlock} key={codeBlock} />].filter(
-      Boolean
-    )
+    return [result, <CodeBlock code={codeBlock} key={codeBlock} />].filter(Boolean)
   })
 
   return (
     <Box
       sx={(theme) => ({
-        backgroundColor:
-          message.role === 'user' ? theme.colors.gray[7] : theme.colors.gray[9],
+        backgroundColor: message.role === 'user' ? theme.colors.gray[7] : theme.colors.gray[9],
         color: theme.colors.gray20,
         padding: '1.2rem',
         border: `1px solid ${theme.black}`,
@@ -71,11 +64,8 @@ const CodeBlock = ({ code }: { code: string }) => {
   const withoutQuotes = code.slice(3, -3).trim()
   const [language, ...rest] = withoutQuotes.split('\n')
 
-  const isSupported =
-    DefaultSyntaxHighlighter.supportedLanguages.includes(language)
-
+  const isSupported = DefaultSyntaxHighlighter.supportedLanguages.includes(language)
   const cleanedCode = (isSupported ? rest : [language, ...rest]).join('\n')
-
   const label = isSupported ? language : null
   //
   return (
