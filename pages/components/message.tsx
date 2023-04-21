@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Stack, Text } from '@mantine/core'
+import { Box, Stack, Text, Transition } from '@mantine/core'
 import { vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import { ChatCompletionResponseMessage } from 'openai'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -11,31 +11,30 @@ import { WrappedMessage } from '@/types'
 const CODE_BLOCK_REGEX = /```[\s\S]*?```/g
 
 export const Message = ({ wrappedMessage }: { wrappedMessage: WrappedMessage }) => {
+  const [opened, setOpened] = React.useState(false)
+
+  React.useEffect(() => {
+    setTimeout(() => setOpened(true), 300)
+  }, [])
+
+  return (
+    <Transition mounted={opened} transition="fade" duration={400} timingFunction="ease">
+      {(styles) => (
+        <Box style={styles}>
+          <MessageInternal wrappedMessage={wrappedMessage} />
+        </Box>
+      )}
+    </Transition>
+  )
+}
+
+const MessageInternal = ({ wrappedMessage }: { wrappedMessage: WrappedMessage }) => {
   const { hidden, message } = wrappedMessage
 
   if (hidden) return null
 
   const parts = message.content.split(CODE_BLOCK_REGEX)
   const contentParts = message.content.match(CODE_BLOCK_REGEX) || []
-
-  const resultingParts = parts.flatMap((part, index) => {
-    const codeBlock = contentParts[index]
-
-    const splited = part.split('\n\n')
-
-    const result = splited
-      .flatMap((part, index) => [
-        <MyText key={part}>{part}</MyText>,
-        index !== splited.length - 1 ? (
-          <Text key={part + '-br'} size="xs">
-            <br />
-          </Text>
-        ) : null,
-      ])
-      .filter(Boolean)
-
-    return [result, <CodeBlock code={codeBlock} key={codeBlock} />].filter(Boolean)
-  })
 
   return (
     <Box
@@ -47,7 +46,24 @@ export const Message = ({ wrappedMessage }: { wrappedMessage: WrappedMessage }) 
         borderRadius: theme.radius.md,
       })}
     >
-      {resultingParts}
+      {parts.flatMap((part, index) => {
+        const codeBlock = contentParts[index]
+
+        const splited = part.split('\n\n')
+
+        const result = splited
+          .flatMap((part, index) => [
+            <MyText key={part}>{part}</MyText>,
+            index !== splited.length - 1 ? (
+              <Text key={part + '-br'} size="xs">
+                <br />
+              </Text>
+            ) : null,
+          ])
+          .filter(Boolean)
+
+        return [result, <CodeBlock code={codeBlock} key={codeBlock} />].filter(Boolean)
+      })}
     </Box>
   )
 }
@@ -69,35 +85,39 @@ const CodeBlock = ({ code }: { code: string }) => {
   const label = isSupported ? language : null
   //
   return (
-    <Stack spacing={'0px'} my="1rem">
-      {label ? (
-        <Text
-          size="xs"
-          color="gray25"
-          bg="dark"
-          p="3px"
-          px="xs"
-          sx={{
-            borderTopLeftRadius: BORDER_RADIUS,
-            borderTopRightRadius: BORDER_RADIUS,
-          }}
-        >
-          {language}
-        </Text>
-      ) : null}
-      <SyntaxHighlighter
-        language={language}
-        style={vs2015}
-        showLineNumbers={true}
-        customStyle={{
-          borderBottomLeftRadius: BORDER_RADIUS,
-          borderBottomRightRadius: BORDER_RADIUS,
-          borderTopLeftRadius: label ? 0 : BORDER_RADIUS,
-          borderTopRightRadius: label ? 0 : BORDER_RADIUS,
-        }}
-      >
-        {cleanedCode}
-      </SyntaxHighlighter>
-    </Stack>
+    <Transition mounted transition={'scale-y'} duration={200} timingFunction="ease">
+      {(styles) => (
+        <Stack spacing={'0px'} my="1rem">
+          {label ? (
+            <Text
+              size="xs"
+              color="gray25"
+              bg="dark"
+              p="3px"
+              px="xs"
+              sx={{
+                borderTopLeftRadius: BORDER_RADIUS,
+                borderTopRightRadius: BORDER_RADIUS,
+              }}
+            >
+              {language}
+            </Text>
+          ) : null}
+          <SyntaxHighlighter
+            language={language}
+            style={vs2015}
+            showLineNumbers={true}
+            customStyle={{
+              borderBottomLeftRadius: BORDER_RADIUS,
+              borderBottomRightRadius: BORDER_RADIUS,
+              borderTopLeftRadius: label ? 0 : BORDER_RADIUS,
+              borderTopRightRadius: label ? 0 : BORDER_RADIUS,
+            }}
+          >
+            {cleanedCode}
+          </SyntaxHighlighter>
+        </Stack>
+      )}
+    </Transition>
   )
 }

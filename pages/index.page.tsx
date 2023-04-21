@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useForm } from '@mantine/form'
-import { Box, Button, Container, Stack, Text, Textarea } from '@mantine/core'
+import { Box, Button, Container, Overlay, Stack, Text, Textarea } from '@mantine/core'
 import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
@@ -62,59 +62,83 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Container sx={{ width: '100%' }} size="md">
-          <Box component="form" onSubmit={form.onSubmit(handleButtonClick)}>
-            <Stack>
-              <Stack spacing={4}>
-                {wrappedMessages
-                  .map((wrappedMessage, index) => {
-                    if (wrappedMessage.hidden) return null
-                    return <Message wrappedMessage={wrappedMessage} key={index} />
-                  })
-                  .filter(Boolean)}
-              </Stack>
-
-              <Textarea
-                //
-                label="Prompt"
-                styles={{
-                  input: {
-                    fontSize: '.9rem',
-                  },
-                }}
-                {...form.getInputProps('prompt')}
-                placeholder="Send a message..."
-                onKeyDown={handleKeyPress}
-              />
-
-              <Button
-                //
-                ref={mantineButtonRef}
-                type="submit"
-                color="success"
-              >
-                Submit
-              </Button>
-
-              <Text
-                onClick={handleClear}
-                c="gray20"
-                component="a"
-                align="center"
-                size="sm"
-                fw="bold"
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': {
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                Clear conversation
-              </Text>
+        <Box component="form" onSubmit={form.onSubmit(handleButtonClick)} w="100%">
+          <Container size="md" pb="110px">
+            <Stack spacing={4}>
+              {wrappedMessages
+                .map((wrappedMessage, index) => {
+                  if (wrappedMessage.hidden) return null
+                  return <Message wrappedMessage={wrappedMessage} key={index} />
+                })
+                .filter(Boolean)}
             </Stack>
+          </Container>
+
+          <Box
+            //
+            px="2rem"
+            pt="sm"
+            //
+            pos="fixed"
+            bottom={0}
+            left={0}
+            right={0}
+            //
+          >
+            <Overlay
+              sx={(theme) => ({
+                background: `linear-gradient(0deg, ${theme.fn.darken(
+                  theme.colors.cyan[9],
+                  0.5
+                )} 0%, rgba(255, 255, 255, 0) 100%)`,
+              })}
+              zIndex={-1}
+            />
+
+            <Container>
+              <Stack spacing={4} py="lg">
+                <Textarea
+                  //
+                  label="Prompt"
+                  styles={{
+                    input: {
+                      fontSize: '.9rem',
+                    },
+                  }}
+                  {...form.getInputProps('prompt')}
+                  placeholder="Send a message..."
+                  onKeyDown={handleKeyPress}
+                />
+
+                <Button
+                  //
+                  ref={mantineButtonRef}
+                  type="submit"
+                  color="success"
+                >
+                  Send message
+                </Button>
+
+                <Text
+                  onClick={handleClear}
+                  c="gray20"
+                  component="a"
+                  align="center"
+                  size="sm"
+                  fw="bold"
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  Clear conversation
+                </Text>
+              </Stack>
+            </Container>
           </Box>
-        </Container>
+        </Box>
       </main>
     </>
   )
