@@ -1,7 +1,18 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
 import { useForm } from '@mantine/form'
-import { Box, Button, Container, Overlay, Stack, Text, Textarea } from '@mantine/core'
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Container,
+  Overlay,
+  Stack,
+  Text,
+  Textarea,
+  useMantineColorScheme,
+  useMantineTheme,
+} from '@mantine/core'
 import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
 import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
@@ -15,6 +26,8 @@ const wrapInWrappedMessage = (message: ChatCompletionResponseMessage, hidden = f
 })
 
 export default function Home() {
+  const { toggleColorScheme } = useMantineColorScheme()
+
   const { mutateAsync: sendMessages } = useOpenAiQuery()
 
   const [wrappedMessages, setWrappedMessages] = useState<WrappedMessage[]>([codeSnippetsFormattingInstructionMessage])
@@ -53,6 +66,8 @@ export default function Home() {
     }
   }
 
+  const theme = useMantineTheme()
+
   return (
     <>
       <Head>
@@ -74,6 +89,34 @@ export default function Home() {
             </Stack>
           </Container>
 
+          <ActionIcon
+            size={'lg'}
+            pos="fixed"
+            right={30}
+            top={30}
+            onClick={() => toggleColorScheme()}
+            c="dark.3"
+            //
+            radius="md"
+            sx={{
+              border: '2px solid currentColor',
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="1.375rem"
+              height="1.375rem"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+            </svg>
+          </ActionIcon>
+
           <Box
             //
             px="2rem"
@@ -88,7 +131,7 @@ export default function Home() {
             <Overlay
               sx={(theme) => ({
                 background: `linear-gradient(0deg, ${theme.fn.darken(
-                  theme.colors.cyan[9],
+                  theme.colorScheme === 'dark' ? theme.colors.cyan[9] : theme.colors.cyan[1],
                   0.5
                 )} 0%, rgba(255, 255, 255, 0) 100%)`,
               })}
@@ -114,7 +157,7 @@ export default function Home() {
                   //
                   ref={mantineButtonRef}
                   type="submit"
-                  color="success"
+                  color={theme.colorScheme === 'dark' ? 'success' : 'dark.4'}
                 >
                   Send message
                 </Button>
