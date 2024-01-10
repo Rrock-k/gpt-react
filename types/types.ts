@@ -1,6 +1,7 @@
-import { ChatCompletionRequestMessage } from 'openai'
+import {} from 'openai'
+import { ChatCompletionMessage } from 'openai/resources'
 
 export type WrappedMessage = {
   hidden: boolean
-  message: ChatCompletionRequestMessage
+  message: ChatCompletionMessage
 }

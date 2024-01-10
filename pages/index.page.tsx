@@ -14,13 +14,13 @@ import {
   useMantineTheme,
 } from '@mantine/core'
 import { useOpenAiQuery } from '@/react-query/useOpenAiQuery'
-import { ChatCompletionResponseMessage } from 'openai'
 import { KeyboardEventHandler, useRef, useState } from 'react'
 import { Message } from './components/message'
 import { codeSnippetsFormattingInstructionMessage } from '@/instructions/instructions'
 import { WrappedMessage } from '@/types'
+import { type ChatCompletionMessage } from 'openai/resources'
 
-const wrapInWrappedMessage = (message: ChatCompletionResponseMessage, hidden = false) => ({
+const wrapInWrappedMessage = (message: ChatCompletionMessage, hidden = false) => ({
   message: message,
   hidden,
 })
@@ -28,7 +28,9 @@ const wrapInWrappedMessage = (message: ChatCompletionResponseMessage, hidden = f
 export default function Home() {
   const { toggleColorScheme } = useMantineColorScheme()
 
-  const { mutateAsync: sendMessages } = useOpenAiQuery()
+  const { mutateAsync: sendMessages, data } = useOpenAiQuery()
+
+  console.log('data', data)
 
   const [wrappedMessages, setWrappedMessages] = useState<WrappedMessage[]>([codeSnippetsFormattingInstructionMessage])
 
@@ -48,7 +50,7 @@ export default function Home() {
     form.setFieldValue('prompt', '')
 
     wrappedMessages.push(wrappedMessage)
-    const responseMessages = await sendMessages(wrappedMessages)
+    const { messages: responseMessages } = await sendMessages(wrappedMessages)
     const newMessage = responseMessages[responseMessages.length - 1]
     setWrappedMessages((old) => (newMessage != null ? [...old, wrapInWrappedMessage(newMessage)] : old))
   }
@@ -126,7 +128,7 @@ export default function Home() {
             bottom={0}
             left={0}
             right={0}
-            //
+          //
           >
             <Overlay
               sx={(theme) => ({

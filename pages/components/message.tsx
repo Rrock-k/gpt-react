@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Stack, Text, Transition } from '@mantine/core'
 import { vs2015 } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
-import { ChatCompletionResponseMessage } from 'openai'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
 import DefaultSyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/default-highlight'
@@ -32,8 +31,9 @@ const MessageInternal = ({ wrappedMessage }: { wrappedMessage: WrappedMessage })
   const { hidden, message } = wrappedMessage
 
   if (hidden) return null
+  message.content = message.content || ''
 
-  const parts = message.content.split(CODE_BLOCK_REGEX)
+  const parts = message.content.split(CODE_BLOCK_REGEX) as string[]
   const contentParts = message.content.match(CODE_BLOCK_REGEX) || []
 
   return (

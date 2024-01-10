@@ -1,43 +1,47 @@
-import {
-  ChatCompletionResponseMessage,
-  Configuration,
-  CreateChatCompletionRequest,
-  OpenAIApi,
-} from 'openai'
+import OpenAI from 'openai'
+import { ChatCompletionCreateParamsNonStreaming, ChatCompletionMessageParam } from 'openai/resources'
 
-const configuration = new Configuration({
+export const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 })
-export const openai = new OpenAIApi(configuration)
 
-const defaultConfig: Omit<CreateChatCompletionRequest, 'messages'> = {
-  model: 'gpt-4',
-  temperature: 0.6,
-  max_tokens: 700,
-  top_p: 1,
-  frequency_penalty: 0,
-  presence_penalty: 0,
+const DEFAULT_MODEL = 'gpt-4-0613'
+
+const defaultConfig: Omit<ChatCompletionCreateParamsNonStreaming, 'messages'> = {
+  model: DEFAULT_MODEL,
+  // temperature: 0.6,
+  // max_tokens: 700,
+  // top_p: 1,
+  // frequency_penalty: 0,
+  // presence_penalty: 0,
   stream: false,
 }
 
-export type AskGptConfig = Partial<
-  Omit<CreateChatCompletionRequest, 'messages'>
->
+export type AskGptConfig = Partial<Omit<ChatCompletionCreateParamsNonStreaming, 'messages'>>
 
 export const askGpt = async (
-  messages: ChatCompletionResponseMessage[],
-  config: Partial<Omit<CreateChatCompletionRequest, 'messages'>> = defaultConfig
+  messages: ChatCompletionMessageParam[],
+  config: Partial<Omit<ChatCompletionCreateParamsNonStreaming, 'messages'>> = {}
 ) => {
   if (config.stream) throw new Error('Stream is not supported here.')
 
-  const result = await openai.createChatCompletion({
+  console.log('defaultConfig', defaultConfig)
+
+  const completion = await openai.chat.completions.create({
+    messages,
     ...defaultConfig,
     ...config,
-    messages,
   })
 
-  const { message } = result.data.choices[0]
+  const list = await openai.models.list().then((res) => {
+    console.log('list:', res)
+    return res
+  })
+
+  console.log('result', completion)
+
+  const { message } = completion.choices[0]
 
   if (message) messages.push(message)
-  return messages
+  return { messages, completion, list }
 }
